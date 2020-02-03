@@ -18,7 +18,19 @@ const mongooseSchema = new mongoose.Schema({
     required: true
   },
   author: String,
-  tags: [String],
+  tags: {
+    type: Array,
+    validate: {
+      isAsync: true,
+      validator: function(x, callback) {
+        // Do some async work
+        setTimeout(() => {
+          const result = x && x.length > 0;
+          callback(result);
+        }, 4000);
+      }
+    }
+  },
   date: { type: Date, default: new Date() },
   isPublish: Boolean,
   price: {
@@ -27,7 +39,7 @@ const mongooseSchema = new mongoose.Schema({
       return this.isPublish;
     },
     min: 10,
-    max: 200
+    max: 50000
   }
 });
 
@@ -38,9 +50,9 @@ async function createCourses() {
     name: "mei",
     category: "web",
     author: "Suchron Rizal Muhammad",
-    tags: ["multimedia", "html", "css3", "javascript"],
+    tags: null,
     isPublish: true,
-    price: 50000
+    price: 40000
   });
   try {
     const result = await course.save();
