@@ -57,16 +57,24 @@ async function updateCourses(id) {
 
 //update a document
 async function updateDocument(id) {
-  const result = await Courses.update(
-    { _id: id },
+  const course = await Courses.findByIdAndUpdate(
+    id,
     {
       $set: {
-        name: "Aldi",
-        isPublish: false
+        name: "Lutfian Hasan",
+        isPublish: true
       }
-    }
+    },
+    { new: true }
   );
-  console.log(result);
+  console.log(course);
 }
 
-updateDocument("5e37a8ce09b0c7032cd0f0fa");
+//remove data
+async function removeData(id) {
+  //const result = await Courses.deleteOne({_id:id})
+  //const result = await Courses.deleteMany(id);
+  const course = await Courses.findByIdAndRemove(id);
+  console.log(course);
+}
+removeData("5e37a8ce09b0c7032cd0f0fa");
