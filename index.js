@@ -11,70 +11,42 @@ mongoose
   .catch((err) => console.error("error connection", err));
 
 const mongooseSchema = new mongoose.Schema({
-  name: String,
+  name: { type: String, required: true, minlength: 3, maxlength: 50 },
+  category: {
+    type: String,
+    enum: ["web", "frontend", "backend"],
+    required: true
+  },
   author: String,
   tags: [String],
   date: { type: Date, default: new Date() },
-  isPublish: Boolean
+  isPublish: Boolean,
+  price: {
+    type: Number,
+    required: function() {
+      return this.isPublish;
+    },
+    min: 10,
+    max: 200
+  }
 });
 
 //save data
 const Courses = mongoose.model("courses", mongooseSchema);
 async function createCourses() {
   const course = new Courses({
-    name: "Nur Cholifah",
-    author: "choifah",
+    name: "mei",
+    category: "web",
+    author: "Suchron Rizal Muhammad",
     tags: ["multimedia", "html", "css3", "javascript"],
-    isPublish: true
+    isPublish: true,
+    price: 50000
   });
-  const result = await course.save();
-  console.log(result);
+  try {
+    const result = await course.save();
+    console.log(result);
+  } catch (ex) {
+    console.log(ex.message);
+  }
 }
-
-//pagination & filtering
-async function getCourses() {
-  const pageNumber = 2;
-  const pageSize = 10;
-  // /api/courses?pageNumber=3&pageSize=10
-  const find = await Courses.find({ name: "Rizal" })
-    .skip((pageNumber - 1) * pageSize)
-    .limit(pageSize)
-    .select({ name: 1 });
-  console.log(find);
-}
-
-//updat data
-async function updateCourses(id) {
-  const course = await Courses.findById(id);
-  if (!course) return;
-
-  course.isPublish = true;
-  course.author = "Another author";
-
-  const result = await course.save();
-  console.log(result);
-}
-
-//update a document
-async function updateDocument(id) {
-  const course = await Courses.findByIdAndUpdate(
-    id,
-    {
-      $set: {
-        name: "Lutfian Hasan",
-        isPublish: true
-      }
-    },
-    { new: true }
-  );
-  console.log(course);
-}
-
-//remove data
-async function removeData(id) {
-  //const result = await Courses.deleteOne({_id:id})
-  //const result = await Courses.deleteMany(id);
-  const course = await Courses.findByIdAndRemove(id);
-  console.log(course);
-}
-removeData("5e37a8ce09b0c7032cd0f0fa");
+createCourses();
